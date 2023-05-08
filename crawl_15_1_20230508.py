@@ -4,19 +4,23 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
 from url import Url
-from utils import webdriver_utils as wu
+from utils import web_driver_utils as wu, logging_utils as lu
 
+logging = lu.get_logger()
+
+
+# URL 설정
 URL = Url().get_url()
 
-driver, act = wu.driver_init(headless=False)
+driver, action = wu.driver_init(headless=False)
 
 driver.get(url=URL)
 
-driver.implicitly_wait(1)
+driver.implicitly_wait(1)  # 묵시적 wait
 
 title = driver.title
-print("start url.py : ", driver.current_url)
-print("page title : ", title)
+logging.info("start url.py : " + driver.current_url)
+logging.info("page title : " +  title)
 
 # 검색 옵션
 select = Select(
@@ -26,22 +30,31 @@ select_options = select.options
 # print(len(select_options)-1)
 select.select_by_index(len(select_options) - 1)
 
-
 # 검색 버튼
 search_btn = driver.find_element(by=By.XPATH,
                                  value='/html/body/div/div[2]/div[2]/div/div/button[1]')
 
 # 검색 액션
-act.click(search_btn).perform()
-wu.action_clear(driver)
-
-# driver.implicitly_wait(5)
+action.click(search_btn).perform()
+wu.clear_action(driver)
 
 try:
-    elem = WebDriverWait(driver, 10).until(
+    elem_table = WebDriverWait(driver, 10).until(  # 명시적 wait
         expected_conditions.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/div[2]/div/div[2]/table"))
     )
+
+except Exception as e:
+    logging.error("table not loaded")
+    raise e
 finally:
-    print("table loaded")
+    logging.info("table loaded")
+
+elem_thead = elem_table.find_element(by=By.TAG_NAME, value="thead")
+elem_ths = elem_thead.find_element(by=By.TAG_NAME, value="tr").find_elements(by=By.TAG_NAME, value="th")
+
+table_head_names = []
+
+for th in elem_ths:
+    logging.info(th.text)
 
 wu.close_webdriver(driver)

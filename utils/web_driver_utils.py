@@ -12,7 +12,7 @@ def close_webdriver(driver):
     print("prcs fin")
 
 
-def action_clear(driver):
+def clear_action(driver):
     ActionBuilder(driver).clear_actions()
 
 
@@ -23,5 +23,5 @@ def driver_init(headless=False):
     if headless:
         options.add_argument('headless')  # 헤드리스
     driver = webdriver.Chrome(service=service, options=options)
-    act = ActionChains(driver)  # 드라이버에 동작을 실행시키는 명령어를 act로 지정
-    return driver, act
+    action = ActionChains(driver)  # 드라이버에 동작을 실행시키는 명령어를 act로 지정
+    return driver, action
