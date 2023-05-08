@@ -1,28 +1,14 @@
-import requests
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from url import Url
-
-from webdriver_manager.chrome import ChromeDriverManager
-
-from selenium import webdriver
-from selenium.webdriver import Keys, ActionChains  # 액션체인 활성화
-from selenium.webdriver.common.actions.action_builder import ActionBuilder
-from selenium.webdriver.support import expected_conditions  # 명시적 대기
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions  # 명시적 대기
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
-URL = Url.get_url()
+from url import Url
+from utils import webdriver_utils as wu
 
-service = ChromeService(executable_path=ChromeDriverManager().install())
-options = Options()
-options.add_argument('--start-maximized')  # 브라우저가 최대화된 상태로 실행됩니다.
-# options.add_argument('headless')  # 헤드리스
-driver = webdriver.Chrome(service=service, options=options)
-act = ActionChains(driver)  # 드라이버에 동작을 실행시키는 명령어를 act로 지정
+URL = Url().get_url()
+
+driver, act = wu.driver_init(headless=False)
 
 driver.get(url=URL)
 
@@ -47,16 +33,15 @@ search_btn = driver.find_element(by=By.XPATH,
 
 # 검색 액션
 act.click(search_btn).perform()
-ActionBuilder(driver).clear_actions()
+wu.action_clear(driver)
 
 # driver.implicitly_wait(5)
 
 try:
-    elem = WebDriverWait(driver, 30).until(
+    elem = WebDriverWait(driver, 10).until(
         expected_conditions.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/div[2]/div/div[2]/table"))
     )
 finally:
     print("table loaded")
 
-print("prcs fin")
-driver.quit()
+wu.close_webdriver(driver)
