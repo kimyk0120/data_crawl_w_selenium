@@ -4,10 +4,10 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
 from url import Url
-from utils import web_driver_utils as wu, logging_utils as lu
+from utils import web_driver_utils as wu
+from utils.logging_utils import Logger
 
-logging = lu.get_logger()
-
+logging = Logger().get_logger()
 
 # URL 설정
 URL = Url().get_url()
@@ -19,8 +19,8 @@ driver.get(url=URL)
 driver.implicitly_wait(1)  # 묵시적 wait
 
 title = driver.title
-logging.info("start url.py : " + driver.current_url)
-logging.info("page title : " +  title)
+logging.info("start url : " + driver.current_url)
+logging.info("page title : " + title)
 
 # 검색 옵션
 select = Select(
